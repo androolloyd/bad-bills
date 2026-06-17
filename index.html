@@ -7,13 +7,16 @@
 <meta name="description" content="Plain-language, non-partisan tracker of the major bills moving through Canada's federal Parliament and every provincial legislature — strengths, weaknesses, and privacy & civil-liberties implications. Updated June 2026.">
 <meta name="theme-color" content="#0b1220">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Bad Bills">
+<meta property="og:url" content="https://badbills.ca/">
 <meta property="og:title" content="Bad Bills — What's actually in the bills">
 <meta property="og:description" content="The major federal & provincial bills that affect your rights, in plain language. Privacy & civil-liberties flagged. Updated June 2026.">
-<meta property="og:image" content="img/og-cover.png">
+<meta property="og:image" content="https://badbills.ca/img/og-cover.png">
+<link rel="canonical" href="https://badbills.ca/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Bad Bills — What's actually in the bills">
 <meta name="twitter:description" content="The major federal & provincial bills that affect your rights, in plain language. Updated June 2026.">
-<meta name="twitter:image" content="img/og-cover.png">
+<meta name="twitter:image" content="https://badbills.ca/img/og-cover.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>">
 <link rel="stylesheet" href="styles.css">
 <script src="analytics.js" defer></script>
@@ -32,6 +35,7 @@
       <a href="#rights">Your rights</a>
       <a href="#act">Take action</a>
     </nav>
+    <button class="theme-toggle" data-share aria-label="Share this site" title="Share this site">🔗</button>
     <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
   </div>
 </header>
@@ -195,6 +199,13 @@
 <section class="section section-alt">
   <div class="wrap">
     <h2 class="section-title">⬇️ Shareables</h2>
+    <div class="share-row">
+      <span class="share-label">📣 Spread the word:</span>
+      <a class="share-btn x" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fbadbills.ca&amp;text=Every%20major%20federal%20%26%20provincial%20bill%2C%20in%20plain%20language%20%E2%80%94%20with%20the%20privacy%20stakes%20flagged%3A" target="_blank" rel="noopener">Share on X</a>
+      <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fbadbills.ca" target="_blank" rel="noopener">Facebook</a>
+      <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbadbills.ca" target="_blank" rel="noopener">LinkedIn</a>
+      <button class="share-btn" data-share>🔗 Copy link</button>
+    </div>
     <div class="downloads">
       <a class="dl" href="downloads/BadBills-Citizen-Packet.pdf"><span class="dl-ico">📄</span><div><b>The full PDF packet</b><br><span class="muted">Every major bill, strengths &amp; weaknesses, privacy notes.</span></div></a>
       <a class="dl" href="img/infographic-federal.png"><span class="dl-ico">🖼️</span><div><b>Infographic — Federal</b><br><span class="muted">The bills to watch. Post-ready.</span></div></a>
@@ -220,5 +231,6 @@
 <script src="app.js"></script>
 <script src="provinces-extra.js"></script>
 <script src="feedback.js" defer></script>
+<script src="share.js" defer></script>
 </body>
 </html>

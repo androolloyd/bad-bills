@@ -12,10 +12,10 @@
 */
 (function () {
   var ANALYTICS = {
-    provider: "none",                         // "plausible" | "goatcounter" | "cloudflare" | "none"
+    provider: "cloudflare",                    // "plausible" | "goatcounter" | "cloudflare" | "none"
     domain: "badbills.ca",                     // Plausible: your site domain
     goatcounter: "",                           // GoatCounter: e.g. "https://badbills.goatcounter.com/count"
-    cloudflareToken: ""                        // Cloudflare Web Analytics beacon token
+    cloudflareToken: ""                        // <<< PASTE your Cloudflare Web Analytics beacon token here to go live
   };
 
   function el(tag, attrs) { var s = document.createElement(tag); for (var k in attrs) s.setAttribute(k, attrs[k]); return s; }
