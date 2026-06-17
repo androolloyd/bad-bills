@@ -152,6 +152,7 @@
       <div style="margin:-2px 0 8px">${statusPill(b)}</div>
       <p class="sum">${b.sum}</p>
       ${b.sponsor ? `<p class="sum" style="font-size:13px;color:var(--muted);margin-top:-4px">Sponsor: ${b.sponsor}</p>` : ``}
+      ${og ? `<div class="card-share"><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(b.num + " — " + b.title)}&url=${encodeURIComponent("https://badbills.ca/b/" + og + ".html")}" target="_blank" rel="noopener">𝕏 Share</a> · <a href="b/${og}.html">Full page →</a></div>` : ``}
       <details><summary>Strengths · weaknesses · privacy · who</summary>${more}</details>
     </article>`;
   }
@@ -166,7 +167,7 @@
       <h4>⚠️ The case against</h4><p class="against">${b.against}</p>
       <div class="priv"><b>🔐 Privacy &amp; civil liberties:</b> ${b.priv}</div>
       <h4 style="margin-top:12px">👥 Who it affects</h4><p class="for">${b.who}</p>
-      <p style="margin-top:12px">${og ? `<a href="b/${og}.html">📚 Sources &amp; commentary →</a>` : ``}${og && link ? ` &nbsp;·&nbsp; ` : ``}${link ? `<a href="${link}" target="_blank" rel="noopener">Official bill page →</a>` : ``}</p>
+      <p style="margin-top:12px">${og ? `<a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(b.num + " — " + b.title)}&url=${encodeURIComponent("https://badbills.ca/b/" + og + ".html")}" target="_blank" rel="noopener">𝕏 Share</a> &nbsp;·&nbsp; <a href="b/${og}.html">📚 Sources &amp; commentary →</a>` : ``}${og && link ? ` &nbsp;·&nbsp; ` : ``}${link ? `<a href="${link}" target="_blank" rel="noopener">Official bill page →</a>` : ``}</p>
     </article>`;
   }
 
