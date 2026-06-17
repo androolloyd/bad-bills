@@ -3,3 +3,6 @@ Thumbs.db
 *.log
 .vscode/
 build/
+# Held out until DNS is live so the github.io preview URL doesn't redirect to a dead domain.
+# When ready for badbills.ca: remove this line, commit CNAME, set the custom domain in Settings -> Pages.
+CNAME

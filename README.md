@@ -1,4 +1,4 @@
-# 🍁 BillWatch
+# 🍁 Bad Bills
 
 A non-partisan, plain-language tracker of the major bills moving through **Canada's federal Parliament** and **every provincial legislature** — with strengths, weaknesses, and **privacy & civil-liberties** implications flagged. Updated June 2026.
 
@@ -17,34 +17,34 @@ A non-partisan, plain-language tracker of the major bills moving through **Canad
 
 ## Deploy to GitHub Pages (the easy path)
 
-1. **Create a repo** on GitHub (e.g. `billwatch`). Public.
+1. **Create a repo** on GitHub (e.g. `badbills`). Public.
 2. **Push these files** to the `main` branch (commands below).
 3. In the repo, go to **Settings → Pages**.
 4. Under **Build and deployment → Source**, choose **Deploy from a branch**.
 5. Branch: **`main`**, folder: **`/ (root)`**. Save.
-6. Wait ~1 minute. Your site is live at `https://<your-username>.github.io/billwatch/`.
+6. Wait ~1 minute. Your site is live at `https://<your-username>.github.io/badbills/`.
 
 ### Push commands
 ```bash
 # from inside this folder
 git init
 git add -A
-git commit -m "BillWatch v1"
+git commit -m "Bad Bills v1"
 git branch -M main
-git remote add origin https://github.com/<your-username>/billwatch.git
+git remote add origin https://github.com/<your-username>/badbills.git
 git push -u origin main
 ```
-(Or use the GitHub CLI: `gh repo create billwatch --public --source=. --push`.)
+(Or use the GitHub CLI: `gh repo create badbills --public --source=. --push`.)
 
 ## Custom domain (once you buy one)
 
 1. Create a file named **`CNAME`** in this folder containing **only your domain**, e.g.:
    ```
-   billwatch.ca
+   badbills.ca
    ```
 2. Commit & push it.
 3. At your domain registrar, add DNS records pointing to GitHub Pages:
-   - **Apex domain** (`billwatch.ca`): four `A` records →
+   - **Apex domain** (`badbills.ca`): four `A` records →
      `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
      (and optional `AAAA` records for IPv6).
    - **`www` subdomain**: a `CNAME` record → `<your-username>.github.io`.
