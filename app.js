@@ -142,7 +142,8 @@
         <span class="lab">⚠️ The case against</span>${b.against}
         <span class="lab">🔐 Privacy &amp; civil liberties</span>${b.priv}
         <span class="lab">👥 Who it affects</span>${b.who}
-        ${og ? `<span class="lab">🔗 Share</span><a href="b/${og}.html">This bill's own shareable page →</a>` : ``}
+        ${(window.ENRICH && og && window.ENRICH[og] && window.ENRICH[og].factCheck) ? `<span class="lab">✔️ Fact-check</span>${window.ENRICH[og].factCheck}` : ``}
+        ${og ? `<span class="lab">🔗 Full page</span><a href="b/${og}.html">Sources, fact-check &amp; commentary →</a>` : ``}
         ${link ? `<span class="lab">🔗 Official</span><a href="${link}" target="_blank" rel="noopener">View on the legislature site →</a>` : ``}
       </div>`;
     return `<article class="card r-${b.risk}">
@@ -165,7 +166,7 @@
       <h4>⚠️ The case against</h4><p class="against">${b.against}</p>
       <div class="priv"><b>🔐 Privacy &amp; civil liberties:</b> ${b.priv}</div>
       <h4 style="margin-top:12px">👥 Who it affects</h4><p class="for">${b.who}</p>
-      <p style="margin-top:12px">${og ? `<a href="b/${og}.html">🔗 Shareable page →</a>` : ``}${og && link ? ` &nbsp;·&nbsp; ` : ``}${link ? `<a href="${link}" target="_blank" rel="noopener">Official bill page →</a>` : ``}</p>
+      <p style="margin-top:12px">${og ? `<a href="b/${og}.html">📚 Sources &amp; commentary →</a>` : ``}${og && link ? ` &nbsp;·&nbsp; ` : ``}${link ? `<a href="${link}" target="_blank" rel="noopener">Official bill page →</a>` : ``}</p>
     </article>`;
   }
 
