@@ -56,5 +56,19 @@ git push -u origin main
 - **The "as of" date?** Update it in `index.html` (hero + footer) and the `asOf` fields.
 - Commit & push — GitHub Pages redeploys automatically.
 
+## Analytics (privacy-friendly)
+Analytics are wired in `analytics.js` but **off by default** (`provider: "none"`). They're cookieless and need no consent banner. To turn on, set the provider + your ID in `analytics.js`:
+- **Plausible** (best for events; paid/self-host) — sign up, add `badbills.ca`.
+- **GoatCounter** (free, open source) — sign up, paste your `…goatcounter.com/count` URL.
+- **Cloudflare Web Analytics** (free pageviews) — paste the beacon token from your Cloudflare dashboard.
+
+Custom events already fire (once a provider is set): `Download`, `Outbound`, `Province`, `Filter`, `BillExpand`, `Search`.
+
+## Shareables
+- `downloads/BadBills-Citizen-Packet.pdf` — the full PDF (all 125 bills).
+- `img/infographic-federal.png`, `img/infographic-provinces.png`, `img/infographic-action.png` — post-ready 1080×1350 cards.
+- `img/og-cover.png` — social link-preview image (1200×630).
+- `share/x-thread.md` — a ready-to-post thread for X / Bluesky / Threads / LinkedIn.
+
 ## Disclaimer
 Informational, non-partisan, and **not legal advice**. Statuses change quickly; always confirm on the official links (LEGISinfo for federal, each province's legislature site).
