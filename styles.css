@@ -203,3 +203,11 @@ a:hover{text-decoration:underline}
 .share-btn:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-1px)}
 .share-btn.x{background:#111;color:#fff;border-color:#111}
 [data-theme="dark"] .share-btn.x{background:#fff;color:#111;border-color:#fff}
+
+/* ===== infographic gallery (top of page) ===== */
+.ig-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ig-card{display:block;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface)}
+.ig-card img{display:block;width:100%;height:auto}
+.ig-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+@media(max-width:900px){.ig-gallery{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.ig-gallery{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
