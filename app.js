@@ -195,7 +195,7 @@
 
   // ---------- PROVINCES render ----------
   const PROV = window.PROVINCES_DATA || {};
-  const PROV_ORDER = ["Nova Scotia","Ontario","Quebec","British Columbia","Alberta","Manitoba","Saskatchewan","New Brunswick","Prince Edward Island","Newfoundland and Labrador"];
+  const PROV_ORDER = ["Nova Scotia","Ontario","Quebec","British Columbia","Alberta","Manitoba","Saskatchewan","New Brunswick","Prince Edward Island","Newfoundland and Labrador","Yukon","Northwest Territories","Nunavut"];
   const provState = { name:null, q:"", risk:"all" };
 
   function provinceNames() {
