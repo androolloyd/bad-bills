@@ -1,0 +1,57 @@
+name: Implement approved fix
+
+# Runs ONLY when a trusted maintainer comments "@claude implement" on an issue.
+# Claude makes the change on a branch and opens a PR linked to the issue. A human
+# still reviews & merges — nothing goes live without approval.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  implement:
+    # Gate: must contain the trigger phrase AND come from a repo owner/member/collaborator.
+    if: >-
+      github.event.issue.pull_request == null &&
+      contains(github.event.comment.body, '@claude implement') &&
+      ( github.event.comment.author_association == 'OWNER' ||
+        github.event.comment.author_association == 'MEMBER' ||
+        github.event.comment.author_association == 'COLLABORATOR' ) &&
+      github.event.issue.locked == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          base_branch: main
+          claude_args: "--max-turns 12"
+          prompt: |
+            A maintainer approved implementing the fix for issue
+            #${{ github.event.issue.number }} (they commented "@claude implement").
+
+            Read the issue and its triage comment, then implement the agreed change in
+            the DATA files only:
+              - Federal bills .............. app.js (the FEDERAL array)
+              - Nova Scotia bills .......... provinces.js
+              - Other provinces' bills ..... provinces-extra.js
+              - Sources/fact-check/commentary  enrich.js
+            (Do NOT hand-edit files in /b or /j — they are generated. Do NOT touch
+            anything under .github/ or feedback-worker/.)
+
+            Requirements:
+              - Keep the edit minimal, valid JavaScript, matching the surrounding style.
+              - If the change is a factual update, only make it if the issue or a cited
+                source supports it; if it can't be verified, open the PR as a DRAFT and
+                say what still needs confirmation.
+              - Create a branch named claude/fix-${{ github.event.issue.number }},
+                commit, and open a pull request whose description contains
+                "Fixes #${{ github.event.issue.number }}" plus a short summary of the change.

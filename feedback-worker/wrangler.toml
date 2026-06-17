@@ -1,0 +1,16 @@
+name = "badbills-feedback"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+REPO = "androolloyd/bad-bills"
+
+# GITHUB_TOKEN is a SECRET — do NOT put it here. Set it with:
+#   wrangler secret put GITHUB_TOKEN
+#
+# To serve the Worker at https://badbills.ca/api/feedback (same-origin, no CORS),
+# add a route in the Cloudflare dashboard (Workers Routes) or uncomment below:
+#
+# [[routes]]
+# pattern = "badbills.ca/api/*"
+# zone_name = "badbills.ca"

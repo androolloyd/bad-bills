@@ -1,0 +1,50 @@
+name: Feedback triage
+
+# Runs when any issue is opened/reopened (including issues created by the feedback Worker).
+# Claude reads it, classifies it, labels it, and posts ONE comment explaining what it
+# understands and the concrete change it would make. It does NOT edit files or open a PR.
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--max-turns 4"
+          prompt: |
+            You are the triage assistant for the "Bad Bills" website repository
+            (https://badbills.ca) — a static site. Where the data lives:
+              - app.js  ............ the FEDERAL array (federal bills)
+              - provinces.js  ...... Nova Scotia bills
+              - provinces-extra.js . the other 9 provinces' bills
+              - enrich.js  ......... per-bill official link, fact-check, sources, commentary
+              - the per-bill pages in /b and /j are GENERATED, never hand-edited.
+
+            Read issue #${{ github.event.issue.number }} (title and body). Then:
+
+            1. CLASSIFY it as exactly one of: correction, outdated-status, missing-source,
+               bug, feature, spam. Add that label and keep the `feedback` label.
+            2. Post ONE comment that includes:
+               - the classification and a one-line reason,
+               - your plain-language understanding of what the reporter wants,
+               - for a data issue: the exact file to change and a concrete BEFORE/AFTER
+                 snippet (in a code block) of the edit you would make,
+               - if a claim needs verification, note what source should confirm it.
+               - If it is spam, say so briefly and close the issue.
+
+            STRICT RULES:
+              - Do NOT edit, create, or delete files. Do NOT commit. Do NOT open a PR.
+              - This is analysis only — a maintainer will later comment "@claude implement".
+              - Do NOT @-mention any user.

@@ -70,5 +70,20 @@ Custom events already fire (once a provider is set): `Download`, `Outbound`, `Pr
 - `img/og-cover.png` — social link-preview image (1200×630).
 - `share/x-thread.md` — a ready-to-post thread for X / Bluesky / Threads / LinkedIn.
 
+## Feedback → auto-fix pipeline
+Readers can report corrections; each becomes a tracked GitHub issue that Claude triages and (on your approval) fixes via a PR you review.
+
+**Flow:**
+`feedback.js` widget → **Cloudflare Worker** (`feedback-worker/`) → **GitHub Issue** (`feedback`,`triage`) → **`.github/workflows/triage.yml`** (Claude classifies + comments its understanding and the exact change) → you comment **`@claude implement`** → **`.github/workflows/fix.yml`** (Claude opens a PR) → you **merge** → Pages redeploys.
+
+A human approves before anything goes live — important for published civic facts. Until the Worker is deployed, the widget **falls back** to opening a pre-filled GitHub issue, so feedback works immediately.
+
+**One-time setup:**
+1. Deploy the Worker — see [`feedback-worker/README.md`](feedback-worker/README.md).
+2. Add repo secret **`ANTHROPIC_API_KEY`** (Settings → Secrets and variables → Actions).
+3. Install the **Claude GitHub App**: https://github.com/apps/claude (select this repo).
+4. Settings → Actions → General → enable **"Allow GitHub Actions to create and approve pull requests."**
+5. Create the issue labels (commands in the Worker README).
+
 ## Disclaimer
 Informational, non-partisan, and **not legal advice**. Statuses change quickly; always confirm on the official links (LEGISinfo for federal, each province's legislature site).
