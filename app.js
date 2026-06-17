@@ -130,21 +130,23 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const RISK_LABEL = { high:"High concern", medium:"Watch closely", low:"Lower concern", positive:"Rights-positive" };
   const stClass = (st) => st === "law" ? "pill-law" : st === "stall" ? "pill-stall" : "pill-move";
+  const slugOf = (key) => (window.OG_SLUGS || {})[key];
 
   function badge(risk){ return `<span class="badge b-${risk}">${RISK_LABEL[risk]}</span>`; }
   function statusPill(b){ return `<span class="pill ${stClass(b.st)}">${b.status}</span>`; }
 
-  function trackerCard(b, link) {
+  function trackerCard(b, link, og, jur) {
     const more = `
       <div class="more">
         <span class="lab">✅ The case for</span>${b.forr}
         <span class="lab">⚠️ The case against</span>${b.against}
         <span class="lab">🔐 Privacy &amp; civil liberties</span>${b.priv}
         <span class="lab">👥 Who it affects</span>${b.who}
+        ${og ? `<span class="lab">🔗 Share</span><a href="b/${og}.html">This bill's own shareable page →</a>` : ``}
         ${link ? `<span class="lab">🔗 Official</span><a href="${link}" target="_blank" rel="noopener">View on the legislature site →</a>` : ``}
       </div>`;
     return `<article class="card r-${b.risk}">
-      <div class="card-top"><span class="card-num">${b.num}</span>${badge(b.risk)}</div>
+      <div class="card-top"><span class="card-num">${b.num}</span>${badge(b.risk)}${jur ? `<span class="juris">· ${jur}</span>` : ``}</div>
       <h3>${b.title}</h3>
       <div style="margin:-2px 0 8px">${statusPill(b)}</div>
       <p class="sum">${b.sum}</p>
@@ -153,7 +155,7 @@
     </article>`;
   }
 
-  function redflagCard(b, link) {
+  function redflagCard(b, link, og) {
     return `<article class="rf">
       <div class="rf-head"><span class="rf-num">${b.num}</span>${badge(b.risk)}</div>
       <h3>${b.title}</h3>
@@ -163,7 +165,7 @@
       <h4>⚠️ The case against</h4><p class="against">${b.against}</p>
       <div class="priv"><b>🔐 Privacy &amp; civil liberties:</b> ${b.priv}</div>
       <h4 style="margin-top:12px">👥 Who it affects</h4><p class="for">${b.who}</p>
-      ${link ? `<p style="margin-top:12px"><a href="${link}" target="_blank" rel="noopener">Official bill page →</a></p>` : ``}
+      <p style="margin-top:12px">${og ? `<a href="b/${og}.html">🔗 Shareable page →</a>` : ``}${og && link ? ` &nbsp;·&nbsp; ` : ``}${link ? `<a href="${link}" target="_blank" rel="noopener">Official bill page →</a>` : ``}</p>
     </article>`;
   }
 
@@ -178,14 +180,14 @@
   function renderFederalRedflags() {
     const host = $("#federal-redflags");
     host.innerHTML = FEDERAL.filter(b => b.featured)
-      .map(b => redflagCard(b, FED_BILL_BASE + b.id)).join("");
+      .map(b => redflagCard(b, FED_BILL_BASE + b.id, slugOf("fed|" + b.num))).join("");
   }
   const fedState = { q:"", risk:"all" };
   function renderFederalTracker() {
     const host = $("#federal-grid");
     const list = FEDERAL.filter(b => (fedState.risk === "all" || b.risk === fedState.risk) && matches(b, fedState.q));
     $("#fed-count").textContent = `${list.length} federal bill${list.length===1?"":"s"} shown`;
-    host.innerHTML = list.length ? list.map(b => trackerCard(b, FED_BILL_BASE + b.id)).join("")
+    host.innerHTML = list.length ? list.map(b => trackerCard(b, FED_BILL_BASE + b.id, slugOf("fed|" + b.num))).join("")
       : `<div class="empty">No federal bills match that filter.</div>`;
   }
 
@@ -225,6 +227,8 @@
     const links = [];
     if (p.billsUrl) links.push(`<a href="${p.billsUrl}" target="_blank" rel="noopener">Official bills list →</a>`);
     if (p.membersUrl) links.push(`<a href="${p.membersUrl}" target="_blank" rel="noopener">Find your member →</a>`);
+    const jslug = slugOf("j|" + provState.name);
+    if (jslug) links.push(`<a href="j/${jslug}.html">Share this province →</a>`);
     host.innerHTML = `
       <div class="pc-name">${provState.name} <span class="muted" style="font-weight:600;font-size:14px">· ${p.legislature || ""}</span></div>
       <div class="pc-meta"><b>Session:</b> ${p.session || "—"} &nbsp;·&nbsp; <b>Government:</b> ${p.government || "—"}</div>
@@ -239,8 +243,36 @@
     if (!p) { host.innerHTML = `<div class="empty">No data yet for this province.</div>`; $("#prov-count").textContent=""; return; }
     const list = (p.bills||[]).filter(b => (provState.risk==="all" || b.risk===provState.risk) && matches(b, provState.q));
     $("#prov-count").textContent = `${list.length} bill${list.length===1?"":"s"} shown for ${provState.name}`;
-    host.innerHTML = list.length ? list.map(b => trackerCard(b, p.billsUrl)).join("")
+    host.innerHTML = list.length ? list.map(b => trackerCard(b, p.billsUrl, slugOf(provState.name + "|" + b.num))).join("")
       : `<div class="empty">No bills match that filter for ${provState.name}.</div>`;
+  }
+
+  // ---------- GLOBAL SEARCH (all bills) ----------
+  const allState = { q: "", jur: "all", risk: "all", status: "all" };
+  function allBills() {
+    const out = FEDERAL.map(b => ({ b, jur: "Federal", link: FED_BILL_BASE + b.id, og: slugOf("fed|" + b.num) }));
+    provinceNames().forEach(n => { const p = PROV[n]; (p.bills || []).forEach(b => out.push({ b, jur: n, link: p.billsUrl, og: slugOf(n + "|" + b.num) })); });
+    return out;
+  }
+  function buildJurSelect() {
+    const sel = $("#jur-all"); if (!sel) return;
+    sel.innerHTML = ['<option value="all">All legislatures</option>', '<option value="Federal">🇨🇦 Federal</option>']
+      .concat(provinceNames().map(n => `<option value="${n}">${n} (${(PROV[n] || {}).abbr || ""})</option>`)).join("");
+    sel.value = allState.jur;
+  }
+  function renderSearch() {
+    const host = $("#search-grid"); if (!host) return;
+    const all = allBills();
+    const q = allState.q.toLowerCase();
+    const list = all.filter(e =>
+      (allState.jur === "all" || e.jur === allState.jur) &&
+      (allState.risk === "all" || e.b.risk === allState.risk) &&
+      (allState.status === "all" || e.b.st === allState.status) &&
+      (matches(e.b, allState.q) || e.jur.toLowerCase().includes(q))
+    );
+    const cnt = $("#all-count"); if (cnt) cnt.textContent = `${list.length} of ${all.length} bills`;
+    host.innerHTML = list.length ? list.map(e => trackerCard(e.b, e.link, e.og, e.jur)).join("")
+      : `<div class="empty">No bills match. Try fewer filters or a different word.</div>`;
   }
 
   // ---------- filter wiring ----------
@@ -256,6 +288,14 @@
     wireChips("fed-risk", r => { fedState.risk = r; renderFederalTracker(); });
     const ps = $("#prov-search"); if (ps) ps.addEventListener("input", e => { provState.q = e.target.value; renderProvince(); });
     wireChips("prov-risk", r => { provState.risk = r; renderProvince(); });
+    // global search
+    const qa = $("#q-all"); if (qa) qa.addEventListener("input", e => { allState.q = e.target.value; renderSearch(); });
+    const ja = $("#jur-all"); if (ja) ja.addEventListener("change", e => { allState.jur = e.target.value; renderSearch(); });
+    wireChips("all-risk", r => { allState.risk = r; renderSearch(); });
+    $$('[data-group="all-status"] .chip').forEach(c => c.addEventListener("click", () => {
+      $$('[data-group="all-status"] .chip').forEach(x => x.classList.remove("active"));
+      c.classList.add("active"); allState.status = c.dataset.status; renderSearch();
+    }));
   }
 
   // ---------- theme ----------
@@ -274,7 +314,7 @@
 
   // ---------- public hook to inject provinces after load ----------
   window.BillWatch = {
-    addProvinces(obj) { Object.assign(PROV, obj); buildProvinceChips(); renderProvince(); }
+    addProvinces(obj) { Object.assign(PROV, obj); buildProvinceChips(); renderProvince(); buildJurSelect(); renderSearch(); }
   };
 
   // ---------- init ----------
@@ -284,6 +324,8 @@
     renderFederalTracker();
     buildProvinceChips();
     renderProvince();
+    buildJurSelect();
+    renderSearch();
     wire();
   });
 })();

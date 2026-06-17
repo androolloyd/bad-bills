@@ -26,6 +26,7 @@
     <a class="brand" href="#top"><span class="leaf">🍁</span> <span class="brand-accent">Bad</span>Bills</a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#overview">Overview</a>
+      <a href="#search">Search</a>
       <a href="#federal">Federal</a>
       <a href="#provinces">Provinces</a>
       <a href="#rights">Your rights</a>
@@ -66,6 +67,36 @@
       <p><strong>Federally,</strong> this is a "security&nbsp;+&nbsp;affordability" session. The Carney government is pushing <strong>national-security and law-and-order bills</strong> — borders, surveillance, hate crime, bail — alongside <strong>cost-of-living measures</strong>. The security bills are where the rights fights are. The biggest is the <strong>Strong Borders Act (C-2)</strong>, which after a huge backlash was <strong>split</strong> into <a href="#federal">C-12</a> (immigration/border — now law) and <a href="#federal">C-22</a> (the "lawful access" surveillance powers — in committee and being rushed).</p>
       <p><strong>In the provinces,</strong> each legislature has its own fights — resource development, health care, housing, privacy/transparency, and policing. Use the <a href="#provinces">Provinces</a> section to jump to yours. We deep-dived all ten.</p>
     </div>
+  </div>
+</section>
+
+<!-- ============ SEARCH ALL ============ -->
+<section id="search" class="section">
+  <div class="wrap">
+    <span class="sec-tag">🔎 Search · all 125 bills</span>
+    <h2 class="section-title">Search &amp; filter every bill</h2>
+    <p class="section-sub">One place to search across the federal Parliament and all ten provinces — then filter by legislature, concern level, and status.</p>
+    <div class="controls">
+      <input id="q-all" class="search" type="search" placeholder="Search all bills — try &ldquo;privacy&rdquo;, &ldquo;bail&rdquo;, &ldquo;housing&rdquo;, &ldquo;C-22&rdquo;, &ldquo;fracking&rdquo;&hellip;" aria-label="Search all bills">
+      <select id="jur-all" class="select" aria-label="Filter by legislature"></select>
+    </div>
+    <div class="controls">
+      <div class="chips" data-group="all-risk" role="group" aria-label="Concern level">
+        <button class="chip active" data-risk="all">Any concern</button>
+        <button class="chip" data-risk="high">High</button>
+        <button class="chip" data-risk="medium">Watch</button>
+        <button class="chip" data-risk="low">Lower</button>
+        <button class="chip" data-risk="positive">Rights-positive</button>
+      </div>
+      <div class="chips" data-group="all-status" role="group" aria-label="Status">
+        <button class="chip active" data-status="all">Any status</button>
+        <button class="chip" data-status="law">Now law</button>
+        <button class="chip" data-status="move">In progress</button>
+        <button class="chip" data-status="stall">Stalled</button>
+      </div>
+    </div>
+    <div id="all-count" class="count"></div>
+    <div id="search-grid" class="tracker-grid"><!-- filled by app.js --></div>
   </div>
 </section>
 
@@ -184,6 +215,7 @@
 </footer>
 
 <script src="provinces.js"></script>
+<script src="slugs.js"></script>
 <script src="app.js"></script>
 <script src="provinces-extra.js"></script>
 </body>
