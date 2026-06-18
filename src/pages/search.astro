@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import BillCard from '../components/BillCard.astro';
+import { allBills, provinceNames, TOTAL } from '../data/bills.mjs';
+
+const items = allBills();
+const names = provinceNames();
+---
+<Base title="Search all bills — Bad Bills" description={`Search and filter all ${TOTAL} major federal, provincial and territorial bills by legislature, concern level, and status.`}>
+  <section class="section">
+    <div class="wrap">
+      <span class="sec-tag">🔎 Search · all {TOTAL} bills</span>
+      <h2 class="section-title">Search &amp; filter every bill</h2>
+      <p class="section-sub">One place to search across the federal Parliament and all 13 provincial &amp; territorial legislatures.</p>
+      <div class="controls">
+        <input class="search" data-search="all-grid" type="search" placeholder="Search all bills — privacy, bail, housing, C-22, fracking…" aria-label="Search all bills" />
+        <select class="select" data-select="all-grid:jur" aria-label="Filter by legislature">
+          <option value="all">All legislatures</option>
+          <option value="Federal">🇨🇦 Federal</option>
+          {names.map((n) => <option value={n}>{n}</option>)}
+        </select>
+      </div>
+      <div class="controls">
+        <div class="chips" data-chips="all-grid:risk" role="group" aria-label="Concern level">
+          <button class="chip active" data-val="all">Any concern</button>
+          <button class="chip" data-val="high">High</button>
+          <button class="chip" data-val="medium">Watch</button>
+          <button class="chip" data-val="low">Lower</button>
+          <button class="chip" data-val="positive">Rights-positive</button>
+        </div>
+        <div class="chips" data-chips="all-grid:status" role="group" aria-label="Status">
+          <button class="chip active" data-val="all">Any status</button>
+          <button class="chip" data-val="law">Now law</button>
+          <button class="chip" data-val="move">In progress</button>
+          <button class="chip" data-val="stall">Stalled</button>
+        </div>
+      </div>
+      <div class="count" data-count="all-grid"></div>
+      <div class="tracker-grid" id="all-grid">{items.map((x) => <BillCard item={x} showJur={true} />)}</div>
+    </div>
+  </section>
+  <script src="/filter.js" defer></script>
+</Base>

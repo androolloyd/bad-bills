@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import BillCard from '../components/BillCard.astro';
+import RedFlag from '../components/RedFlag.astro';
+import { FEDERAL, ENRICH, VOTES, SLUGS, FED_BILL_BASE } from '../data/bills.mjs';
+
+const items = FEDERAL.map((b) => {
+  const slug = SLUGS['fed|' + b.num];
+  return { b, jur: 'Federal', section: 'federal', slug, og: ENRICH[slug], vote: VOTES[b.num] || null, link: FED_BILL_BASE + b.id };
+});
+const featured = items.filter((x) => x.b.featured);
+---
+<Base title="Federal bills — Bad Bills" description="Every major bill before Canada's 45th Parliament — borders, surveillance, hate, bail, social media — with sources, fact-checks, and how your MP voted." ogImage="/img/og/j-federal.png">
+  <section class="section section-alt">
+    <div class="wrap">
+      <span class="sec-tag">🇨🇦 Federal · Parliament of Canada</span>
+      <h2 class="section-title">Federal Parliament</h2>
+      <p class="section-sub">45th Parliament, 1st session · Liberal majority under PM Mark Carney. Red-flag bills first, then the full tracker with vote results.</p>
+
+      <h3 class="sub-h">🚩 Red-flag bills — the ones to actually read</h3>
+      <div class="redflag-cards">{featured.map((x) => <RedFlag item={x} />)}</div>
+
+      <h3 class="sub-h" style="margin-top:34px">📋 Full federal tracker</h3>
+      <div class="controls">
+        <input class="search" data-search="fed-grid" type="search" placeholder="Search federal bills (privacy, bail, C-22)…" aria-label="Search federal bills" />
+        <div class="chips" data-chips="fed-grid:risk" role="group" aria-label="Concern level">
+          <button class="chip active" data-val="all">Any concern</button>
+          <button class="chip" data-val="high">High</button>
+          <button class="chip" data-val="medium">Watch</button>
+          <button class="chip" data-val="positive">Rights-positive</button>
+        </div>
+      </div>
+      <div class="count" data-count="fed-grid"></div>
+      <div class="tracker-grid" id="fed-grid">{items.map((x) => <BillCard item={x} />)}</div>
+    </div>
+  </section>
+  <script src="/filter.js" defer></script>
+</Base>

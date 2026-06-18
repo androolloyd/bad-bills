@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Contact your representatives — Bad Bills" description="Find your MP & provincial/territorial member, see how your MP voted, and send a ready-to-edit email or call script — from your own address.">
+  <section class="section">
+    <div class="wrap">
+      <h2 class="section-title">✉️ Contact your representatives</h2>
+      <p class="section-sub">Type your postal code or address, pick a bill, and send a ready-to-edit letter to your MP and your provincial/territorial member — sent from your own email, so it actually gets read. See your MP's recorded House votes, too.</p>
+      <div id="contact-tool"></div>
+
+      <h3 class="sub-h" style="margin-top:36px">✅ More ways to act</h3>
+      <div class="action-grid">
+        <a class="action" href="https://www.ourcommons.ca/members/en" target="_blank" rel="noopener"><h3>Find your federal MP →</h3><p>The official member directory.</p></a>
+        <a class="action" href="https://www.ourcommons.ca/committees/en/home" target="_blank" rel="noopener"><h3>Submit to a committee →</h3><p>Committees take written public comments on bills under study — the most direct input there is.</p></a>
+        <a class="action" href="https://www.parl.ca/legisinfo" target="_blank" rel="noopener"><h3>Check a bill (LEGISinfo) →</h3><p>The official, always-current federal status and full text.</p></a>
+        <a class="action" href="/search"><h3>Find a bill to write about →</h3><p>Search every bill, then come back and send a letter.</p></a>
+      </div>
+    </div>
+  </section>
+  <script is:inline src="/votes.js"></script>
+  <script is:inline src="/contact.js" defer></script>
+</Base>

@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import BillCard from '../components/BillCard.astro';
+import { provinceNames, PROVINCES, ENRICH, SLUGS } from '../data/bills.mjs';
+
+const names = provinceNames();
+const items = [];
+names.forEach((n) => {
+  const p = PROVINCES[n];
+  (p.bills || []).forEach((b) => {
+    const slug = SLUGS[n + '|' + b.num];
+    items.push({ b, jur: n, section: 'provinces', slug, og: ENRICH[slug], vote: null, link: p.billsUrl });
+  });
+});
+---
+<Base title="Provinces & Territories — Bad Bills" description="The major bills before all 10 provinces and 3 territories, deep-dived with the same privacy & civil-liberties lens." ogImage="/img/og-cover.png">
+  <section class="section">
+    <div class="wrap">
+      <span class="sec-tag">🍁 Provincial &amp; Territorial · 13 legislatures</span>
+      <h2 class="section-title">Provinces &amp; Territories</h2>
+      <p class="section-sub">Pick your province or territory. (NWT &amp; Nunavut use consensus government — no parties.)</p>
+
+      <div class="chips province-chips" data-prov-chips="prov-grid" role="group" aria-label="Choose province or territory">
+        {names.map((n, i) => (
+          <button class={`chip ${i === 0 ? 'active' : ''}`} data-prov={n}>{n} <span class="muted" style="font-weight:600">{PROVINCES[n].abbr}</span></button>
+        ))}
+      </div>
+
+      {names.map((n, i) => {
+        const p = PROVINCES[n];
+        const slug = SLUGS['j|' + n] || (p.abbr || n).toLowerCase();
+        return (
+          <div class="prov-context" data-prov-ctx={n} style={i === 0 ? '' : 'display:none'}>
+            <div class="pc-name">{n} <span class="muted" style="font-weight:600;font-size:14px">· {p.legislature || ''}</span></div>
+            <div class="pc-meta"><b>Session:</b> {p.session || '—'} &nbsp;·&nbsp; <b>Government:</b> {p.government || '—'}</div>
+            {p.notes && <div class="pc-meta" style="margin-top:6px">{p.notes}</div>}
+            <div class="pc-links">
+              {p.billsUrl && <a href={p.billsUrl} target="_blank" rel="noopener">Official bills list →</a>}
+              {p.membersUrl && <Fragment> &nbsp; <a href={p.membersUrl} target="_blank" rel="noopener">Find your member →</a></Fragment>}
+              &nbsp; <a href={`/j/${slug}`}>Share this {n} page →</a>
+            </div>
+          </div>
+        );
+      })}
+
+      <div class="controls" style="margin-top:18px">
+        <input class="search" data-search="prov-grid" type="search" placeholder="Search this province's bills…" aria-label="Search provincial bills" />
+        <div class="chips" data-chips="prov-grid:risk" role="group" aria-label="Concern level">
+          <button class="chip active" data-val="all">Any concern</button>
+          <button class="chip" data-val="high">High</button>
+          <button class="chip" data-val="medium">Watch</button>
+          <button class="chip" data-val="positive">Rights-positive</button>
+        </div>
+      </div>
+      <div class="count" data-count="prov-grid"></div>
+      <div class="tracker-grid" id="prov-grid">{items.map((x) => <BillCard item={x} />)}</div>
+    </div>
+  </section>
+  <script src="/filter.js" defer></script>
+</Base>

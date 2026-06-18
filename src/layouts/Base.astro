@@ -1,0 +1,89 @@
+---
+import '../styles/global.css';
+const SITE = 'https://badbills.ca';
+const {
+  title,
+  description = "The major bills before Canada's Parliament and every province & territory — in plain language, with the privacy & civil-liberties stakes flagged.",
+  ogImage = '/img/og-cover.png',
+} = Astro.props;
+const canonical = SITE + Astro.url.pathname;
+const ogAbs = ogImage.startsWith('http') ? ogImage : SITE + ogImage;
+const favicon = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>";
+const path = Astro.url.pathname;
+const on = (p) => (path === p || (p !== '/' && path.startsWith(p)) ? 'aria-current="page"' : '');
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bad Bills" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogAbs} />
+  <meta property="og:url" content={canonical} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogAbs} />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="icon" href={favicon} />
+</head>
+<body>
+  <header class="nav" id="top">
+    <div class="wrap nav-inner">
+      <a class="brand" href="/"><span class="leaf">🍁</span> <span class="brand-accent">Bad</span>Bills</a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="/federal">Federal</a>
+        <a href="/provinces">Provinces</a>
+        <a href="/search">Search</a>
+      </nav>
+      <a class="nav-cta" href="/act">📞 Contact</a>
+      <button class="theme-toggle" data-share aria-label="Share this site" title="Share this site">🔗</button>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main id="main"><slot /></main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p class="disclaimer"><strong>Non-partisan &amp; informational.</strong> This site summarizes and simplifies; it is <strong>not legal advice</strong>. Statuses are accurate to <strong>June&nbsp;18, 2026</strong> and change quickly — confirm on the official links. Built to help citizens read the laws that affect them.</p>
+      <p class="sources"><strong>Sources:</strong> Parliament of Canada / LEGISinfo, Department of Justice, Canada.ca, provincial &amp; territorial legislatures, privacy commissioners, openparliament.ca &amp; the House of Commons vote record; analysis from the CCLA, Canadian Constitution Foundation, OpenMedia, EFF, the Canadian Council for Refugees, Michael Geist and major law firms; reporting from CBC, The Globe and Mail and regional outlets.</p>
+      <p class="colophon"><span class="leaf">🍁</span> <b>Bad Bills</b> · <a href="/">badbills.ca</a></p>
+    </div>
+  </footer>
+
+  <nav class="mobile-nav" aria-label="Quick navigation">
+    <a href="/"><span class="mi">🏠</span>Home</a>
+    <a href="/search"><span class="mi">🔎</span>Search</a>
+    <a href="/federal"><span class="mi">🇨🇦</span>Federal</a>
+    <a href="/provinces"><span class="mi">🍁</span>Regions</a>
+    <a href="/act"><span class="mi">📞</span>Contact</a>
+  </nav>
+
+  <script is:inline>
+    (function () {
+      var saved; try { saved = localStorage.getItem('bw-theme'); } catch (e) {}
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+      document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('themeToggle'); if (!btn) return;
+        var sync = function () { btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; };
+        sync();
+        btn.addEventListener('click', function () {
+          var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+          document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+          try { localStorage.setItem('bw-theme', dark ? 'light' : 'dark'); } catch (e) {}
+          sync();
+        });
+      });
+    })();
+  </script>
+  <script src="/feedback.js" defer></script>
+  <script src="/share.js" defer></script>
+</body>
+</html>

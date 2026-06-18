@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import BillCard from '../../components/BillCard.astro';
+import { jurisdictions, ENRICH, VOTES, SLUGS, FED_BILL_BASE } from '../../data/bills.mjs';
+
+export function getStaticPaths() {
+  return jurisdictions().map((j) => ({ params: { slug: j.slug }, props: { j } }));
+}
+
+const { j } = Astro.props;
+const items = j.bills.map((b) => {
+  const slug = j.section === 'federal' ? SLUGS['fed|' + b.num] : SLUGS[j.name + '|' + b.num];
+  return {
+    b, jur: j.name, section: j.section, slug, og: ENRICH[slug],
+    vote: j.section === 'federal' ? (VOTES[b.num] || null) : null,
+    link: j.section === 'federal' ? (FED_BILL_BASE + b.id) : j.meta.billsUrl,
+  };
+});
+const desc = `${j.bills.length} major bills before ${j.label}, with sources, fact-checks and the privacy & civil-liberties stakes.`;
+const xUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent('https://badbills.ca/j/' + j.slug)}&text=${encodeURIComponent(j.label + ' — the bills to watch, on Bad Bills')}`;
+---
+<Base title={`${j.label} — Bad Bills`} description={desc} ogImage={`/img/og/j-${j.slug}.png`}>
+  <section class="section">
+    <div class="wrap">
+      <a href={j.section === 'federal' ? '/federal' : '/provinces'} style="font-weight:700">← All legislatures</a>
+      <h1 style="font-size:clamp(28px,5vw,40px);letter-spacing:-.02em;margin:10px 0 4px">{j.label}</h1>
+      <p class="section-sub">{j.meta.session ? `${j.meta.session} · ` : ''}{j.meta.government || ''}</p>
+      {j.meta.notes && <p class="section-sub" style="font-size:14px">{j.meta.notes}</p>}
+      <div class="share-row" style="margin:4px 0 20px">
+        <a class="share-btn x" href={xUrl} target="_blank" rel="noopener">Share on X</a>
+        <button class="share-btn" type="button" data-share>🔗 Copy link</button>
+      </div>
+      <div class="tracker-grid">{items.map((it) => <BillCard item={it} />)}</div>
+    </div>
+  </section>
+</Base>

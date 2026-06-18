@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import { allBills } from '../../data/bills.mjs';
+
+export function getStaticPaths() {
+  return allBills().map((x) => ({ params: { slug: x.slug }, props: { item: x } }));
+}
+
+const { item } = Astro.props;
+const b = item.b;
+const og = item.og || {};
+const vote = item.vote;
+const RISK_LABEL = { high: 'High concern', medium: 'Watch closely', low: 'Lower concern', positive: 'Rights-positive' };
+const RC = { high: 'var(--high)', medium: 'var(--med)', low: 'var(--low)', positive: 'var(--pos)' };
+const eyebrow = item.jur === 'Federal' ? 'Federal · Parliament of Canada' : `${item.jur} · Provincial / Territorial`;
+const backHref = item.section === 'federal' ? '/federal' : '/provinces';
+const pageUrl = `https://badbills.ca/b/${item.slug}`;
+const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${b.num} — ${b.title} (${RISK_LABEL[b.risk]}). What it does, who's for & against, and the privacy stakes:`)}&url=${encodeURIComponent(pageUrl)}`;
+const stanceCls = (s) => { s = (s || '').toLowerCase(); return s.includes('support') ? 'cm-pos' : s.includes('oppos') ? 'cm-neg' : 'cm-mix'; };
+---
+<Base title={`${b.num} ${b.title} — Bad Bills`} description={b.sum} ogImage={`/img/og/${item.slug}.png`}>
+  <div class="wrap bp">
+    <a class="back" href={backHref}>← {eyebrow}</a>
+    <article class="rf" style={`border-left-color:${RC[b.risk]}`}>
+      <div class="rf-head"><span class="rf-num">{b.num}</span><span class={`badge b-${b.risk}`}>{RISK_LABEL[b.risk]}</span></div>
+      <h1>{b.title}</h1>
+      <div class="meta">{b.sponsor ? `Sponsor: ${b.sponsor} · ` : ''}Status: {b.status} · {eyebrow}</div>
+      {vote && (
+        <div class="bp-vote">🗳️ House of Commons vote ({vote.stage}): <b>{vote.result} {vote.yea}–{vote.nay}</b>{vote.paired ? ` · ${vote.paired} paired` : ''} · {vote.date} · <a href={vote.url} target="_blank" rel="noopener">official record</a></div>
+      )}
+      <p class="blurb" style="font-size:18px">{b.sum}</p>
+      <h4>✅ The case for</h4><p>{b.forr}</p>
+      <h4>⚠️ The case against</h4><p>{b.against}</p>
+      <div class="priv"><b>🔐 Privacy &amp; civil liberties:</b> {b.priv}</div>
+      <h4 style="margin-top:12px">👥 Who it affects</h4><p>{b.who}</p>
+    </article>
+
+    {og.factCheck && (
+      <div class="enrich"><div class="fc"><span class="fc-b">✔️ Fact-check</span>{og.factCheck}</div></div>
+    )}
+    {og.commentary && og.commentary.length > 0 && (
+      <div class="enrich">
+        <h3 class="es-h">🗣️ What people are saying</h3>
+        <div class="cmts">
+          {og.commentary.map((c) => (
+            <div class={`cm ${stanceCls(c.stance)}`}>
+              <div class="cm-h"><b>{c.source}</b><span class="cm-st">{c.stance}</span></div>
+              <p>“{c.quote}”</p>
+              {c.url && <a href={c.url} target="_blank" rel="noopener">source →</a>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+    {og.sources && og.sources.length > 0 && (
+      <div class="enrich">
+        <h3 class="es-h">📚 Sources &amp; further reading</h3>
+        <ul class="srcs">
+          {og.sources.map((s) => (<li><a href={s.url} target="_blank" rel="noopener">{s.title}</a>{s.type && <span class="src-t"> {s.type}</span>}</li>))}
+        </ul>
+      </div>
+    )}
+
+    <div class="btnrow">
+      <a class="b2 bx" href={xUrl} target="_blank" rel="noopener">Share on X</a>
+      <button class="b2" type="button" data-share>🔗 Share</button>
+      <a class="b2 bx" href={`/act?bill=${encodeURIComponent(b.num + ' — ' + b.title)}`}>✉️ Email your rep</a>
+      {og.officialUrl
+        ? <a class="b2" href={og.officialUrl} target="_blank" rel="noopener">Official bill text →</a>
+        : (item.link && <a class="b2" href={item.link} target="_blank" rel="noopener">Official bill page →</a>)}
+      <a class="b2" href={backHref}>See in tracker →</a>
+      <button class="b2" type="button" data-feedback data-fb-bill={`${b.num} ${b.title}`}>Suggest a correction</button>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,140 @@
+---
+import Base from '../layouts/Base.astro';
+import { riskBreakdown, TOTAL, provinceNames, VOTES } from '../data/bills.mjs';
+
+const rb = riskBreakdown();
+const segs = [
+  { c: 'var(--high)', n: rb.high, label: 'High concern' },
+  { c: 'var(--med)', n: rb.medium, label: 'Watch closely' },
+  { c: 'var(--low)', n: rb.low, label: 'Lower concern' },
+  { c: 'var(--pos)', n: rb.positive, label: 'Rights-positive' },
+];
+const CIRC = 2 * Math.PI * 42;
+let acc = 0;
+const arcs = segs.map((s) => {
+  const len = TOTAL ? (s.n / TOTAL) * CIRC : 0;
+  const dash = `${len.toFixed(2)} ${(CIRC - len).toFixed(2)}`;
+  const off = (-acc).toFixed(2);
+  acc += len;
+  return { ...s, dash, off };
+});
+const regions = provinceNames().length;
+const recordedVotes = Object.keys(VOTES).length;
+---
+<Base title="Bad Bills — What's actually in the bills (Federal + every Province & Territory)">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="kicker">Non-partisan · Plain language · Sources linked</span>
+      <h1>What's <em>actually</em> in the bills.</h1>
+      <p class="lede">The major laws moving through <strong>Canada's Parliament</strong> and <strong>every province &amp; territory</strong> — what each one does, who's for and against it, how your MP voted, and what it means for your <strong>privacy and civil liberties</strong>.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/federal">Federal red-flag bills</a>
+        <a class="btn btn-ghost" href="/provinces">Your province</a>
+        <a class="btn btn-ghost" href="/act">📞 Contact your reps</a>
+      </div>
+      <p class="updated">Updated <strong>June&nbsp;18, 2026</strong> · {TOTAL} bills · 14 legislatures · <span class="muted">verify on the official links before relying on a status.</span></p>
+    </div>
+  </section>
+
+  <!-- SNAPSHOT / INFOGRAPHICS (lightbox) -->
+  <section id="snapshot" class="section section-alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="st-title">The quick picture</h2>
+        <div class="st-rule"></div>
+        <p class="st-sub">The whole story in three cards — tap to open, then save &amp; share.</p>
+      </div>
+      <div class="ig-gallery">
+        <a class="ig-card" data-lightbox href="/img/infographic-federal.png"><img src="/img/infographic-federal-web.png" width="800" height="1000" alt="Federal: the bills that touch your rights" loading="lazy" decoding="async" /></a>
+        <a class="ig-card" data-lightbox href="/img/infographic-provinces.png"><img src="/img/infographic-provinces-web.png" width="800" height="1000" alt="Your province has a bill to watch too" loading="lazy" decoding="async" /></a>
+        <a class="ig-card" data-lightbox href="/img/infographic-action.png"><img src="/img/infographic-action-web.png" width="800" height="1000" alt="Don't get fooled, then act" loading="lazy" decoding="async" /></a>
+      </div>
+      <div class="snap-tools">
+        <a class="share-btn x" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fbadbills.ca&amp;text=Every%20major%20federal%2C%20provincial%20%26%20territorial%20bill%2C%20in%20plain%20language." target="_blank" rel="noopener">Share on X</a>
+        <a class="share-btn" href="/downloads/BadBills-Citizen-Packet.pdf">⬇️ PDF · {TOTAL} bills</a>
+        <a class="share-btn" data-lightbox href="/img/og-cover.png">🖼️ Cover image</a>
+        <button class="share-btn" data-share>🔗 Copy link</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE FACTS — donut data viz -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="st-title">But let's get to the facts</h2>
+        <div class="st-rule"></div>
+        <p class="st-sub">Of {TOTAL} major bills we track, here's how the concern breaks down.</p>
+      </div>
+      <div class="viz">
+        <svg class="donut" viewBox="0 0 100 100" role="img" aria-label="Concern-level breakdown">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="14"></circle>
+          {arcs.map((a) => (
+            <circle cx="50" cy="50" r="42" fill="none" stroke={a.c} stroke-width="14" stroke-dasharray={a.dash} stroke-dashoffset={a.off} transform="rotate(-90 50 50)"></circle>
+          ))}
+          <text x="50" y="48" text-anchor="middle" font-size="16" font-weight="850" fill="var(--ink)">{TOTAL}</text>
+          <text x="50" y="61" text-anchor="middle" font-size="7" fill="var(--muted)">bills tracked</text>
+        </svg>
+        <div class="viz-legend">
+          {segs.map((s) => (
+            <div class="lg"><span class="sw" style={`background:${s.c}`}></span> <b>{s.n}</b> &nbsp;{s.label}</div>
+          ))}
+          <p class="muted" style="font-size:14px;margin-top:6px">Concern flags privacy / civil-liberties risk — not whether a bill is "good." Rights-positive bills (relief, citizenship fixes, clean water) are flagged too.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW STATS -->
+  <section id="overview" class="section section-alt">
+    <div class="wrap">
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-num">{TOTAL}</div><div class="stat-label">major bills tracked, federal + provincial + territorial</div></div>
+        <div class="stat"><div class="stat-num">14</div><div class="stat-label">legislatures — Parliament + 10 provinces + 3 territories</div></div>
+        <div class="stat"><div class="stat-num">{rb.high}</div><div class="stat-label">high-concern bills for privacy &amp; civil liberties</div></div>
+        <div class="stat"><div class="stat-num">{recordedVotes}</div><div class="stat-label">federal bills with recorded House votes — see how your MP voted</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MYTH CHECK -->
+  <section class="section">
+    <div class="wrap">
+      <div class="mythbox">
+        <div class="mythbox-icon">🛑</div>
+        <div>
+          <h3>Before you share a scary "bill number," check it.</h3>
+          <p>Bill numbers get <strong>recycled every Parliament</strong>, and viral posts pin alarming claims on the wrong one. Example: <strong>"Bill&nbsp;C-206"</strong> is passed around as sinister — but in this Parliament <strong>C-206 is the <em>National Strategy on Brain Injuries Act</em></strong>, a harmless health bill. Confirm any number on <a href="https://www.parl.ca/legisinfo" target="_blank" rel="noopener">LEGISinfo</a> first.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK NAV -->
+  <section class="section section-alt">
+    <div class="wrap">
+      <div class="sec-head"><h2 class="st-title">Where do you want to start?</h2><div class="st-rule"></div></div>
+      <div class="action-grid">
+        <a class="action" href="/federal"><h3>🇨🇦 Federal bills →</h3><p>The 6 red-flag bills (C-2/22, C-8, C-9, C-14, C-34) + the full federal tracker with vote results.</p></a>
+        <a class="action" href="/provinces"><h3>🍁 Your province / territory →</h3><p>All 10 provinces + 3 territories, each deep-dived with the same privacy lens.</p></a>
+        <a class="action" href="/search"><h3>🔎 Search every bill →</h3><p>Search and filter all {TOTAL} bills by legislature, concern, and status.</p></a>
+        <a class="action" href="/act"><h3>📞 Contact your reps →</h3><p>Find your MP &amp; MLA, see how your MP voted, and send a ready letter or call script.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- lightbox -->
+  <div class="lb-overlay" id="lb"><button class="lb-close" id="lb-x" aria-label="Close">×</button><img id="lb-img" alt="" /></div>
+  <script is:inline>
+    (function () {
+      var lb = document.getElementById('lb'), img = document.getElementById('lb-img'), x = document.getElementById('lb-x');
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('[data-lightbox]');
+        if (a) { e.preventDefault(); img.src = a.getAttribute('href'); lb.classList.add('show'); return; }
+        if (e.target === lb || e.target === x) { lb.classList.remove('show'); img.src = ''; }
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('show')) { lb.classList.remove('show'); img.src = ''; } });
+    })();
+  </script>
+</Base>

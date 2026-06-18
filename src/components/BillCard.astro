@@ -1,0 +1,34 @@
+---
+const { item, showJur = false } = Astro.props;
+const b = item.b;
+const og = item.og || {};
+const RISK_LABEL = { high: 'High concern', medium: 'Watch closely', low: 'Lower concern', positive: 'Rights-positive' };
+const stCls = b.st === 'law' ? 'pill-law' : b.st === 'stall' ? 'pill-stall' : 'pill-move';
+const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(b.num + ' — ' + b.title)}&url=${encodeURIComponent('https://badbills.ca/b/' + item.slug)}`;
+const text = (b.num + ' ' + b.title + ' ' + b.sum + ' ' + item.jur).toLowerCase();
+---
+<article class={`card r-${b.risk}`} data-risk={b.risk} data-status={b.st} data-jur={item.jur} data-text={text}>
+  <div class="card-top">
+    <span class="card-num">{b.num}</span>
+    <span class={`badge b-${b.risk}`}>{RISK_LABEL[b.risk]}</span>
+    {showJur && <span class="juris">· {item.jur}</span>}
+  </div>
+  <h3>{b.title}</h3>
+  <div style="margin:-2px 0 8px"><span class={`pill ${stCls}`}>{b.status}</span></div>
+  {item.vote && <div class="vote-line">🗳️ {item.vote.result} {item.vote.yea}–{item.vote.nay} <span class="muted" style="font-weight:600">· {item.vote.stage}</span></div>}
+  <p class="sum">{b.sum}</p>
+  {item.slug && (
+    <div class="card-share"><a href={xUrl} target="_blank" rel="noopener">𝕏 Share</a> · <a href={`/b/${item.slug}`}>Full page →</a></div>
+  )}
+  <details>
+    <summary>Strengths · weaknesses · privacy · who</summary>
+    <div class="more">
+      <span class="lab">✅ The case for</span><div>{b.forr}</div>
+      <span class="lab">⚠️ The case against</span><div>{b.against}</div>
+      <span class="lab">🔐 Privacy &amp; civil liberties</span><div>{b.priv}</div>
+      <span class="lab">👥 Who it affects</span><div>{b.who}</div>
+      {og.factCheck && (<Fragment><span class="lab">✔️ Fact-check</span><div>{og.factCheck}</div></Fragment>)}
+      {item.slug && (<Fragment><span class="lab">🔗 Full page</span><a href={`/b/${item.slug}`}>Sources, fact-check &amp; commentary →</a></Fragment>)}
+    </div>
+  </details>
+</article>
