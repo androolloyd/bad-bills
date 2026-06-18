@@ -160,6 +160,16 @@ a:hover{text-decoration:underline}
 .ct-rep-a .b2.bx{background:var(--accent);color:#fff;border-color:var(--accent)}
 .ct-rep-a .b2:hover{border-color:var(--accent);text-decoration:none}
 @media(max-width:700px){.ct-grid,.ct-reps{grid-template-columns:1fr}}
+.ct-tools{margin-top:12px}
+.ct-tools .b2{display:inline-block;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-family:inherit}
+.ct-tools .b2:hover{border-color:var(--accent)}
+.ct-rep-a .b2.ct-call{font-variant-numeric:tabular-nums}
+
+/* header CTA + top share bar */
+.nav-cta{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-weight:800;font-size:14px;padding:9px 14px;border-radius:10px;white-space:nowrap}
+.nav-cta:hover{text-decoration:none;transform:translateY(-1px)}
+@media(max-width:900px){.nav-cta{margin-left:auto;font-size:13px;padding:8px 12px}}
+.snap-tools{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
 
 /* ===== theme / action / downloads ===== */

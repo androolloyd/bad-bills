@@ -54,17 +54,41 @@
       "Thank you,\n" + name;
   }
   function repByEmail(e) { for (var i = 0; i < state.reps.length; i++) if (state.reps[i].email === e) return state.reps[i]; return null; }
+  function phoneOf(r) { var o = r.offices || []; var i; for (i = 0; i < o.length; i++) if (/constituency/i.test(o[i].type) && o[i].tel) return o[i].tel; for (i = 0; i < o.length; i++) if (o[i].tel) return o[i].tel; return ""; }
+
+  function downloadScript() {
+    if (!state.reps.length) return;
+    var bill = ($("ct-bill").value || "").trim() || "a bill currently before the House";
+    var name = ($("ct-name").value || "").trim() || "[your name]";
+    var district = (state.reps[0] && state.reps[0].district_name) ? state.reps[0].district_name : "";
+    var L = ["BAD BILLS — Call script   (badbills.ca)", "Re: " + bill, "", "WHO TO CALL"];
+    state.reps.forEach(function (r) { var t = phoneOf(r); L.push("• " + r.name + " (" + (r.elected_office || "") + ")" + (t ? " — " + t : " — no number listed") + (r.district_name ? "   [" + r.district_name + "]" : "")); });
+    L.push("", "WHAT TO SAY",
+      '"Hi, my name is ' + name + " and I'm a constituent" + (district ? " in " + district : "") + ". I'm calling about " + bill + ". I'd like my representative to take a clear, public position on it. Can you tell me where they stand and how they plan to vote? Thank you.\"",
+      "", "TIPS",
+      "• Keep it short and polite — 30 seconds is plenty.",
+      "• You don't need to be an expert. Say you're a constituent, name the bill, and ask their position.",
+      "• Phone calls are weighed more heavily than emails — constituency offices tally them.",
+      "", "Made with badbills.ca");
+    var blob = new Blob([L.join("\n")], { type: "text/plain" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a"); a.href = url; a.download = "call-script.txt"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    if (window.track) window.track("CallScript", {});
+  }
 
   function repCard(r) {
     var fed = /House of Commons/i.test(r.representative_set_name);
     var email = r.email || "";
+    var tel = phoneOf(r);
+    var callBtn = tel ? '<a class="b2 ct-call" href="tel:' + esc(tel.replace(/[^\d+]/g, "")) + '">📞 ' + esc(tel) + '</a>' : '';
     var meta = [r.party_name, r.district_name, r.representative_set_name].filter(Boolean).map(esc).join(" · ");
     var action = email
       ? '<a class="b2 bx ct-mail" data-email="' + esc(email) + '" href="#">✉️ Email ' + esc(firstName(r.name)) + '</a>' +
         '<button class="b2 ct-copy" type="button" data-email="' + esc(email) + '">Copy letter</button>'
       : (r.url ? '<a class="b2" href="' + esc(r.url) + '" target="_blank" rel="noopener">Open contact page →</a>' : '<span class="muted">No public email listed</span>');
     return '<div class="ct-rep"><div class="ct-rep-h"><b>' + esc(r.name) + '</b> <span class="pill ' + (fed ? "pill-move" : "pill-law") + '">' + esc(r.elected_office || (fed ? "MP" : "Member")) + '</span></div>' +
-      '<div class="ct-rep-m">' + meta + '</div><div class="ct-rep-a">' + action + '</div></div>';
+      '<div class="ct-rep-m">' + meta + '</div><div class="ct-rep-a">' + action + callBtn + '</div></div>';
   }
   function renderReps(reps) {
     var rel = relevant(reps);
@@ -101,11 +125,13 @@
         '<label class="fb-l">Subject</label><input id="ct-subj" class="fb-in" placeholder="(auto-filled — edit if you like)">' +
         '<label class="fb-l">Your message <span style="text-transform:none;font-weight:400">(optional — a default is added if blank)</span></label>' +
         '<textarea id="ct-msg" class="fb-in" rows="4" placeholder="Add a sentence or two in your own words — it makes a real difference."></textarea>' +
+        '<div class="ct-tools"><button id="ct-dl" class="b2" type="button">⬇️ Download call script (.txt)</button></div>' +
         '<div id="ct-reps" class="ct-reps"></div>' +
       '</div>';
 
     $("ct-find").addEventListener("click", function () { lookup($("ct-loc-input").value); });
     $("ct-loc-input").addEventListener("keydown", function (e) { if (e.key === "Enter") lookup($("ct-loc-input").value); });
+    var dl = $("ct-dl"); if (dl) dl.addEventListener("click", downloadScript);
     host.addEventListener("click", function (e) {
       var m = e.target.closest(".ct-mail");
       if (m) { e.preventDefault(); var r = repByEmail(m.getAttribute("data-email")); if (r) window.location.href = "mailto:" + encodeURIComponent(r.email) + "?subject=" + encodeURIComponent(subjectFor()) + "&body=" + encodeURIComponent(bodyFor(r)); if (window.track) window.track("ContactEmail", {}); return; }
