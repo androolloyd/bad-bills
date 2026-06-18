@@ -15,6 +15,7 @@
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   function firstName(n) { return String(n || "").split(" ")[0]; }
+  function norm(s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/g, ""); }
   function dedupe(list) { var seen = {}, out = []; list.forEach(function (r) { var k = (r.name || "") + "|" + (r.representative_set_name || ""); if (seen[k]) return; seen[k] = 1; out.push(r); }); return out; }
   function relevant(reps) {
     return reps.filter(function (r) { return RELEVANT.test(r.representative_set_name || ""); })
@@ -90,6 +91,25 @@
     return '<div class="ct-rep"><div class="ct-rep-h"><b>' + esc(r.name) + '</b> <span class="pill ' + (fed ? "pill-move" : "pill-law") + '">' + esc(r.elected_office || (fed ? "MP" : "Member")) + '</span></div>' +
       '<div class="ct-rep-m">' + meta + '</div><div class="ct-rep-a">' + action + callBtn + '</div></div>';
   }
+  function renderMpVotes() {
+    var host = $("ct-votes"); if (!host) return;
+    var mp = state.reps.filter(function (r) { return /House of Commons/i.test(r.representative_set_name); })[0];
+    if (!window.VOTES || !mp) { host.innerHTML = ""; return; }
+    var nm = norm(mp.name);
+    var keys = Object.keys(window.VOTES).sort(function (a, b) { return (window.VOTES[b].date || "").localeCompare(window.VOTES[a].date || ""); });
+    var rows = [];
+    keys.forEach(function (bill) {
+      var v = window.VOTES[bill], bal = v.members[nm];
+      if (!bal) return;
+      var cls = bal === "Yea" ? "v-yea" : bal === "Nay" ? "v-nay" : "v-oth";
+      rows.push('<tr><td class="vb">' + esc(bill) + '</td><td class="vt">' + esc(v.title || "") + '</td><td class="' + cls + '">' + esc(bal) + '</td><td class="vr">' + esc(v.result) + ' ' + v.yea + '–' + v.nay + '</td></tr>');
+    });
+    if (!rows.length) { host.innerHTML = '<div class="mpvotes"><p class="muted">No recorded House of Commons votes found for ' + esc(mp.name) + ' yet.</p></div>'; return; }
+    host.innerHTML = '<div class="mpvotes"><h4>🗳️ How ' + esc(mp.name) + ' voted in the House of Commons</h4>' +
+      '<div class="mpv-wrap"><table class="mpv-table"><thead><tr><th>Bill</th><th>Title</th><th>Their&nbsp;vote</th><th>Result</th></tr></thead><tbody>' + rows.join("") + '</tbody></table></div>' +
+      '<p class="muted" style="font-size:12px;margin-top:8px">House of Commons recorded divisions (source: openparliament.ca). Your provincial/territorial member votes in their own legislature, not shown here.</p></div>';
+  }
+
   function renderReps(reps) {
     var rel = relevant(reps);
     if (!rel.length) { status("No federal or provincial representative found for that location. Try a postal code.", "err"); return; }
@@ -97,6 +117,7 @@
     status(rel.length + " representative" + (rel.length === 1 ? "" : "s") + " found — edit the letter below, then send it from your email.", "ok");
     $("ct-form").style.display = "";
     $("ct-reps").innerHTML = rel.map(repCard).join("");
+    renderMpVotes();
   }
 
   function lookup(val, silent) {
@@ -127,6 +148,7 @@
         '<textarea id="ct-msg" class="fb-in" rows="4" placeholder="Add a sentence or two in your own words — it makes a real difference."></textarea>' +
         '<div class="ct-tools"><button id="ct-dl" class="b2" type="button">⬇️ Download call script (.txt)</button></div>' +
         '<div id="ct-reps" class="ct-reps"></div>' +
+        '<div id="ct-votes"></div>' +
       '</div>';
 
     $("ct-find").addEventListener("click", function () { lookup($("ct-loc-input").value); });

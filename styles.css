@@ -170,6 +170,21 @@ a:hover{text-decoration:underline}
 .nav-cta:hover{text-decoration:none;transform:translateY(-1px)}
 @media(max-width:900px){.nav-cta{margin-left:auto;font-size:13px;padding:8px 12px}}
 .snap-tools{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+
+/* ===== vote records ===== */
+.vote-line{font-size:13px;font-weight:800;color:var(--ink-2);margin:-2px 0 8px}
+.mpvotes{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.mpvotes h4{margin:0 0 10px;font-size:16px}
+.mpv-wrap{overflow-x:auto}
+.mpv-table{width:100%;border-collapse:collapse;font-size:14px}
+.mpv-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+.mpv-table td{padding:7px 8px;border-bottom:1px solid var(--line)}
+.mpv-table .vb{font-weight:800;white-space:nowrap}
+.mpv-table .vt{color:var(--ink-2)}
+.mpv-table .vr{color:var(--muted);white-space:nowrap}
+.mpv-table .v-yea{color:var(--pos);font-weight:800}
+.mpv-table .v-nay{color:var(--high);font-weight:800}
+.mpv-table .v-oth{color:var(--muted);font-weight:700}
 .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
 
 /* ===== theme / action / downloads ===== */

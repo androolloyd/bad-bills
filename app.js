@@ -150,6 +150,7 @@
       <div class="card-top"><span class="card-num">${b.num}</span>${badge(b.risk)}${jur ? `<span class="juris">· ${jur}</span>` : ``}</div>
       <h3>${b.title}</h3>
       <div style="margin:-2px 0 8px">${statusPill(b)}</div>
+      ${(window.VOTES && window.VOTES[b.num]) ? `<div class="vote-line">🗳️ ${window.VOTES[b.num].result} ${window.VOTES[b.num].yea}–${window.VOTES[b.num].nay} <span class="muted" style="font-weight:600">· ${window.VOTES[b.num].stage}</span></div>` : ``}
       <p class="sum">${b.sum}</p>
       ${b.sponsor ? `<p class="sum" style="font-size:13px;color:var(--muted);margin-top:-4px">Sponsor: ${b.sponsor}</p>` : ``}
       ${og ? `<div class="card-share"><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(b.num + " — " + b.title)}&url=${encodeURIComponent("https://badbills.ca/b/" + og + ".html")}" target="_blank" rel="noopener">𝕏 Share</a> · <a href="b/${og}.html">Full page →</a></div>` : ``}
