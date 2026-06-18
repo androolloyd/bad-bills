@@ -1,6 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
-import { riskBreakdown, TOTAL, provinceNames, VOTES } from '../data/bills.mjs';
+import Share from '../components/Share.astro';
+import RedFlag from '../components/RedFlag.astro';
+import BillCard from '../components/BillCard.astro';
+import { FEDERAL, PROVINCES, provinceNames, ENRICH, VOTES, SLUGS, FED_BILL_BASE, TOTAL, riskBreakdown } from '../data/bills.mjs';
+
+const fedItems = FEDERAL.map((b) => { const slug = SLUGS['fed|' + b.num]; return { b, jur: 'Federal', section: 'federal', slug, og: ENRICH[slug], vote: VOTES[b.num] || null, link: FED_BILL_BASE + b.id }; });
+const featured = fedItems.filter((x) => x.b.featured);
+const names = provinceNames();
+const provItems = [];
+names.forEach((n) => { const p = PROVINCES[n]; (p.bills || []).forEach((b) => { const slug = SLUGS[n + '|' + b.num]; provItems.push({ b, jur: n, section: 'provinces', slug, og: ENRICH[slug], vote: null, link: p.billsUrl }); }); });
 
 const rb = riskBreakdown();
 const segs = [
@@ -11,14 +20,7 @@ const segs = [
 ];
 const CIRC = 2 * Math.PI * 42;
 let acc = 0;
-const arcs = segs.map((s) => {
-  const len = TOTAL ? (s.n / TOTAL) * CIRC : 0;
-  const dash = `${len.toFixed(2)} ${(CIRC - len).toFixed(2)}`;
-  const off = (-acc).toFixed(2);
-  acc += len;
-  return { ...s, dash, off };
-});
-const regions = provinceNames().length;
+const arcs = segs.map((s) => { const len = TOTAL ? (s.n / TOTAL) * CIRC : 0; const dash = `${len.toFixed(2)} ${(CIRC - len).toFixed(2)}`; const off = (-acc).toFixed(2); acc += len; return { ...s, dash, off }; });
 const recordedVotes = Object.keys(VOTES).length;
 ---
 <Base title="Bad Bills — What's actually in the bills (Federal + every Province & Territory)">
@@ -29,112 +31,157 @@ const recordedVotes = Object.keys(VOTES).length;
       <h1>What's <em>actually</em> in the bills.</h1>
       <p class="lede">The major laws moving through <strong>Canada's Parliament</strong> and <strong>every province &amp; territory</strong> — what each one does, who's for and against it, how your MP voted, and what it means for your <strong>privacy and civil liberties</strong>.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="/federal">Federal red-flag bills</a>
-        <a class="btn btn-ghost" href="/provinces">Your province</a>
-        <a class="btn btn-ghost" href="/act">📞 Contact your reps</a>
+        <a class="btn btn-primary" href="#federal">Federal red-flag bills</a>
+        <a class="btn btn-ghost" href="#provinces">Your province</a>
+        <a class="btn btn-ghost" href="#act">📞 Contact your reps</a>
       </div>
       <p class="updated">Updated <strong>June&nbsp;18, 2026</strong> · {TOTAL} bills · 14 legislatures · <span class="muted">verify on the official links before relying on a status.</span></p>
     </div>
   </section>
 
-  <!-- SNAPSHOT / INFOGRAPHICS (lightbox) -->
+  <!-- QUICK PICTURE -->
   <section id="snapshot" class="section section-alt">
     <div class="wrap">
-      <div class="sec-head">
-        <h2 class="st-title">The quick picture</h2>
-        <div class="st-rule"></div>
-        <p class="st-sub">The whole story in three cards — tap to open, then save &amp; share.</p>
-      </div>
+      <div class="sec-head"><h2 class="st-title">The quick picture</h2><div class="st-rule"></div><p class="st-sub">The whole story in three cards — tap to open, then save &amp; share.</p></div>
       <div class="ig-gallery">
         <a class="ig-card" data-lightbox href="/img/infographic-federal.png"><img src="/img/infographic-federal-web.png" width="800" height="1000" alt="Federal: the bills that touch your rights" loading="lazy" decoding="async" /></a>
         <a class="ig-card" data-lightbox href="/img/infographic-provinces.png"><img src="/img/infographic-provinces-web.png" width="800" height="1000" alt="Your province has a bill to watch too" loading="lazy" decoding="async" /></a>
         <a class="ig-card" data-lightbox href="/img/infographic-action.png"><img src="/img/infographic-action-web.png" width="800" height="1000" alt="Don't get fooled, then act" loading="lazy" decoding="async" /></a>
       </div>
-      <div class="snap-tools">
-        <a class="share-btn x" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fbadbills.ca&amp;text=Every%20major%20federal%2C%20provincial%20%26%20territorial%20bill%2C%20in%20plain%20language." target="_blank" rel="noopener">Share on X</a>
+      <Share url="https://badbills.ca" text="What's actually in the bills — every major federal, provincial & territorial bill in Canada, in plain language, with the privacy stakes flagged." title="Bad Bills" />
+      <div class="snap-tools" style="margin-top:6px">
         <a class="share-btn" href="/downloads/BadBills-Citizen-Packet.pdf">⬇️ PDF · {TOTAL} bills</a>
         <a class="share-btn" data-lightbox href="/img/og-cover.png">🖼️ Cover image</a>
-        <button class="share-btn" data-share>🔗 Copy link</button>
       </div>
     </div>
   </section>
 
-  <!-- THE FACTS — donut data viz -->
+  <!-- THE FACTS — donut -->
   <section class="section">
     <div class="wrap">
-      <div class="sec-head">
-        <h2 class="st-title">But let's get to the facts</h2>
-        <div class="st-rule"></div>
-        <p class="st-sub">Of {TOTAL} major bills we track, here's how the concern breaks down.</p>
-      </div>
+      <div class="sec-head"><h2 class="st-title">But let's get to the facts</h2><div class="st-rule"></div><p class="st-sub">Of {TOTAL} major bills we track, here's how the concern breaks down.</p></div>
       <div class="viz">
         <svg class="donut" viewBox="0 0 100 100" role="img" aria-label="Concern-level breakdown">
           <circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="14"></circle>
-          {arcs.map((a) => (
-            <circle cx="50" cy="50" r="42" fill="none" stroke={a.c} stroke-width="14" stroke-dasharray={a.dash} stroke-dashoffset={a.off} transform="rotate(-90 50 50)"></circle>
-          ))}
+          {arcs.map((a) => <circle cx="50" cy="50" r="42" fill="none" stroke={a.c} stroke-width="14" stroke-dasharray={a.dash} stroke-dashoffset={a.off} transform="rotate(-90 50 50)"></circle>)}
           <text x="50" y="48" text-anchor="middle" font-size="16" font-weight="850" fill="var(--ink)">{TOTAL}</text>
           <text x="50" y="61" text-anchor="middle" font-size="7" fill="var(--muted)">bills tracked</text>
         </svg>
         <div class="viz-legend">
-          {segs.map((s) => (
-            <div class="lg"><span class="sw" style={`background:${s.c}`}></span> <b>{s.n}</b> &nbsp;{s.label}</div>
-          ))}
-          <p class="muted" style="font-size:14px;margin-top:6px">Concern flags privacy / civil-liberties risk — not whether a bill is "good." Rights-positive bills (relief, citizenship fixes, clean water) are flagged too.</p>
+          {segs.map((s) => <div class="lg"><span class="sw" style={`background:${s.c}`}></span> <b>{s.n}</b> &nbsp;{s.label}</div>)}
+          <p class="muted" style="font-size:14px;margin-top:6px">Concern flags privacy / civil-liberties risk — not whether a bill is "good." Rights-positive bills are flagged too.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- OVERVIEW STATS -->
-  <section id="overview" class="section section-alt">
+  <!-- FEDERAL -->
+  <section id="federal" class="section section-alt">
     <div class="wrap">
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-num">{TOTAL}</div><div class="stat-label">major bills tracked, federal + provincial + territorial</div></div>
-        <div class="stat"><div class="stat-num">14</div><div class="stat-label">legislatures — Parliament + 10 provinces + 3 territories</div></div>
-        <div class="stat"><div class="stat-num">{rb.high}</div><div class="stat-label">high-concern bills for privacy &amp; civil liberties</div></div>
-        <div class="stat"><div class="stat-num">{recordedVotes}</div><div class="stat-label">federal bills with recorded House votes — see how your MP voted</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MYTH CHECK -->
-  <section class="section">
-    <div class="wrap">
-      <div class="mythbox">
-        <div class="mythbox-icon">🛑</div>
-        <div>
-          <h3>Before you share a scary "bill number," check it.</h3>
-          <p>Bill numbers get <strong>recycled every Parliament</strong>, and viral posts pin alarming claims on the wrong one. Example: <strong>"Bill&nbsp;C-206"</strong> is passed around as sinister — but in this Parliament <strong>C-206 is the <em>National Strategy on Brain Injuries Act</em></strong>, a harmless health bill. Confirm any number on <a href="https://www.parl.ca/legisinfo" target="_blank" rel="noopener">LEGISinfo</a> first.</p>
+      <span class="sec-tag">🇨🇦 Federal · Parliament of Canada</span>
+      <h2 class="section-title">Federal Parliament</h2>
+      <p class="section-sub">45th Parliament, 1st session · Liberal majority under PM Mark Carney. Red-flag bills first, then the full tracker with vote results.</p>
+      <h3 class="sub-h">🚩 Red-flag bills — the ones to actually read</h3>
+      <div class="redflag-cards">{featured.map((x) => <RedFlag item={x} />)}</div>
+      <h3 class="sub-h" style="margin-top:34px">📋 Full federal tracker</h3>
+      <div class="controls">
+        <input class="search" data-search="fed-grid" type="search" placeholder="Search federal bills…" aria-label="Search federal bills" />
+        <div class="chips" data-chips="fed-grid:risk" role="group" aria-label="Concern level">
+          <button class="chip active" data-val="all">Any concern</button>
+          <button class="chip" data-val="high">High</button>
+          <button class="chip" data-val="medium">Watch</button>
+          <button class="chip" data-val="positive">Rights-positive</button>
         </div>
       </div>
+      <div class="count" data-count="fed-grid"></div>
+      <div class="tracker-grid" id="fed-grid">{fedItems.map((x) => <BillCard item={x} />)}</div>
     </div>
   </section>
 
-  <!-- QUICK NAV -->
-  <section class="section section-alt">
+  <!-- PROVINCES -->
+  <section id="provinces" class="section">
     <div class="wrap">
-      <div class="sec-head"><h2 class="st-title">Where do you want to start?</h2><div class="st-rule"></div></div>
-      <div class="action-grid">
-        <a class="action" href="/federal"><h3>🇨🇦 Federal bills →</h3><p>The 6 red-flag bills (C-2/22, C-8, C-9, C-14, C-34) + the full federal tracker with vote results.</p></a>
-        <a class="action" href="/provinces"><h3>🍁 Your province / territory →</h3><p>All 10 provinces + 3 territories, each deep-dived with the same privacy lens.</p></a>
-        <a class="action" href="/search"><h3>🔎 Search every bill →</h3><p>Search and filter all {TOTAL} bills by legislature, concern, and status.</p></a>
-        <a class="action" href="/act"><h3>📞 Contact your reps →</h3><p>Find your MP &amp; MLA, see how your MP voted, and send a ready letter or call script.</p></a>
+      <span class="sec-tag">🍁 Provincial &amp; Territorial · 13 legislatures</span>
+      <h2 class="section-title">Provinces &amp; Territories</h2>
+      <p class="section-sub">Pick your province or territory. (NWT &amp; Nunavut use consensus government — no parties.)</p>
+      <div class="chips province-chips" data-prov-chips="prov-grid" role="group" aria-label="Choose province or territory">
+        {names.map((n, i) => <button class={`chip ${i === 0 ? 'active' : ''}`} data-prov={n}>{n} <span class="muted" style="font-weight:600">{PROVINCES[n].abbr}</span></button>)}
+      </div>
+      {names.map((n, i) => {
+        const p = PROVINCES[n];
+        return (
+          <div class="prov-context" data-prov-ctx={n} style={i === 0 ? '' : 'display:none'}>
+            <div class="pc-name">{n} <span class="muted" style="font-weight:600;font-size:14px">· {p.legislature || ''}</span></div>
+            <div class="pc-meta"><b>Session:</b> {p.session || '—'} &nbsp;·&nbsp; <b>Government:</b> {p.government || '—'}</div>
+            {p.notes && <div class="pc-meta" style="margin-top:6px">{p.notes}</div>}
+          </div>
+        );
+      })}
+      <div class="controls" style="margin-top:18px">
+        <input class="search" data-search="prov-grid" type="search" placeholder="Search this province's bills…" aria-label="Search provincial bills" />
+        <div class="chips" data-chips="prov-grid:risk" role="group" aria-label="Concern level">
+          <button class="chip active" data-val="all">Any concern</button>
+          <button class="chip" data-val="high">High</button>
+          <button class="chip" data-val="medium">Watch</button>
+          <button class="chip" data-val="positive">Rights-positive</button>
+        </div>
+      </div>
+      <div class="count" data-count="prov-grid"></div>
+      <div class="tracker-grid" id="prov-grid">{provItems.map((x) => <BillCard item={x} />)}</div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="act" class="section section-alt">
+    <div class="wrap">
+      <h2 class="section-title">✉️ Contact your representatives</h2>
+      <p class="section-sub">Type your postal code or address, pick a bill, and send a ready-to-edit letter to your MP and provincial/territorial member — from your own email. See how your MP voted, and grab a call script.</p>
+      <div id="contact-tool"></div>
+    </div>
+  </section>
+
+  <!-- lightbox (open + share image in-page) -->
+  <div class="lb-overlay" id="lb">
+    <button class="lb-close" id="lb-x" aria-label="Close">×</button>
+    <div class="lb-inner">
+      <img id="lb-img" alt="" />
+      <div class="lb-actions">
+        <button class="share-btn s-x" id="lb-share">📣 Share image</button>
+        <a class="share-btn" id="lb-dl" download>⬇️ Download</a>
+        <a class="share-btn" id="lb-x2" href="#" target="_blank" rel="noopener">𝕏 Post</a>
       </div>
     </div>
-  </section>
-
-  <!-- lightbox -->
-  <div class="lb-overlay" id="lb"><button class="lb-close" id="lb-x" aria-label="Close">×</button><img id="lb-img" alt="" /></div>
+  </div>
   <script is:inline>
     (function () {
       var lb = document.getElementById('lb'), img = document.getElementById('lb-img'), x = document.getElementById('lb-x');
+      var dl = document.getElementById('lb-dl'), share = document.getElementById('lb-share'), xpost = document.getElementById('lb-x2');
+      var current = '';
+      function open(href) { current = href; img.src = href; dl.href = href; dl.setAttribute('download', href.split('/').pop());
+        xpost.href = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(location.origin + href) + '&text=' + encodeURIComponent('From Bad Bills — what’s actually in the bills:');
+        share.textContent = '📣 Share image'; lb.classList.add('show'); }
+      function close() { lb.classList.remove('show'); img.src = ''; }
       document.addEventListener('click', function (e) {
         var a = e.target.closest && e.target.closest('[data-lightbox]');
-        if (a) { e.preventDefault(); img.src = a.getAttribute('href'); lb.classList.add('show'); return; }
-        if (e.target === lb || e.target === x) { lb.classList.remove('show'); img.src = ''; }
+        if (a) { e.preventDefault(); open(a.getAttribute('href')); return; }
+        if (e.target === lb || e.target === x) close();
       });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('show')) { lb.classList.remove('show'); img.src = ''; } });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('show')) close(); });
+      share.addEventListener('click', async function () {
+        var url = location.origin + current;
+        try {
+          if (navigator.canShare) {
+            var resp = await fetch(current); var blob = await resp.blob();
+            var file = new File([blob], current.split('/').pop(), { type: blob.type });
+            if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Bad Bills' }); return; }
+          }
+          if (navigator.share) { await navigator.share({ title: 'Bad Bills', text: 'What’s actually in the bills', url: url }); return; }
+          await navigator.clipboard.writeText(url); share.textContent = '✓ Link copied';
+        } catch (e) {}
+      });
     })();
   </script>
+  <script is:inline src="/votes.js"></script>
+  <script is:inline src="/filter.js" defer></script>
+  <script is:inline src="/contact.js" defer></script>
 </Base>

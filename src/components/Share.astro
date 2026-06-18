@@ -1,0 +1,20 @@
+---
+const { url, text = '', title = 'Bad Bills', label = '📣 Share:' } = Astro.props;
+const u = encodeURIComponent(url);
+const t = encodeURIComponent(text || title);
+const ti = encodeURIComponent(title);
+const nets = [
+  { l: 'X', cls: 'x', h: `https://twitter.com/intent/tweet?url=${u}&text=${t}` },
+  { l: 'Facebook', cls: 'fb', h: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
+  { l: 'WhatsApp', cls: 'wa', h: `https://wa.me/?text=${t}%20${u}` },
+  { l: 'Reddit', cls: 'rd', h: `https://www.reddit.com/submit?url=${u}&title=${ti}` },
+  { l: 'Bluesky', cls: 'bs', h: `https://bsky.app/intent/compose?text=${t}%20${u}` },
+  { l: 'LinkedIn', cls: 'li', h: `https://www.linkedin.com/sharing/share-offsite/?url=${u}` },
+  { l: 'Email', cls: 'em', h: `mailto:?subject=${ti}&body=${t}%20${u}` },
+];
+---
+<div class="share-row">
+  <span class="share-label">{label}</span>
+  {nets.map((n) => <a class={`share-btn s-${n.cls}`} href={n.h} target="_blank" rel="noopener">{n.l}</a>)}
+  <button class="share-btn" type="button" data-share>🔗 Copy link</button>
+</div>

@@ -332,4 +332,17 @@ a:hover{text-decoration:underline}
 .lb-overlay{position:fixed;inset:0;z-index:90;background:rgba(8,12,22,.88);display:none;align-items:center;justify-content:center;padding:18px}
 .lb-overlay.show{display:flex}
 .lb-overlay img{max-width:100%;max-height:92vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.lb-close{position:fixed;top:12px;right:18px;font-size:34px;color:#fff;background:none;border:none;cursor:pointer;line-height:1}
+.lb-close{position:fixed;top:12px;right:18px;font-size:34px;color:#fff;background:none;border:none;cursor:pointer;line-height:1;z-index:2}
+.lb-inner{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:100%}
+.lb-inner img{max-width:100%;max-height:82vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lb-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.lb-actions .share-btn{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.28)}
+.lb-actions .share-btn:hover{border-color:#fff}
+/* share-button platform tints */
+.share-btn.s-x{background:#111;color:#fff;border-color:#111}
+[data-theme="dark"] .share-btn.s-x{background:#fff;color:#111;border-color:#fff}
+.share-btn.s-fb{border-color:#1877f2;color:#1877f2}
+.share-btn.s-wa{border-color:#22b85a;color:#159a47}
+.share-btn.s-rd{border-color:#ff4500;color:#ff4500}
+.share-btn.s-bs{border-color:#1185fe;color:#1185fe}
+.share-btn.s-li{border-color:#0a66c2;color:#0a66c2}
